@@ -2,6 +2,7 @@ package scanFiles
 
 import (
 	"os"
+	"fmt"
 	"errors"
 )
 
@@ -25,7 +26,14 @@ func FindFeatureFiles(path string) ([]string, error) {
 	}
 
 	for _, file := range files {
-		fileNames = append(fileNames, path + file.Name())
+		if file.IsDir() {
+			fileNamesInDir, err := FindFeatureFiles(path + "/" + file.Name())
+			if err != nil {
+				fmt.Println("Something went wrong while looking up %s", path)
+			}
+			fileNames = append(fileNames, fileNamesInDir...)
+		}
+		fileNames = append(fileNames, path + "/" + file.Name())
 	}
 	return fileNames, nil;
 }
