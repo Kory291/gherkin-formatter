@@ -45,7 +45,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().Bool("dry-run", false, "Set this value if you don't want the changes to be written to the files.")
 }
 
 
