@@ -5,9 +5,8 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/Kory291/gherkin-formatter/pkg/scanFiles"
+	"github.com/Kory291/gherkin-formatter/pkg/fileHandling"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +16,7 @@ var scanFilesCmd = &cobra.Command{
 	Short: "Returns all found Feature files",
 	Long: `This command can be used to retrieve a list of all feature files that are discovered by gherkin-formatter`,
 	Run: func(cmd *cobra.Command, args []string) {
-		pwd, err := scanFiles.WhereAmI()
+		pwd, err := fileHandling.WhereAmI()
 		if err != nil {
 			panic("Could not determine current directory")
 		}
@@ -29,11 +28,11 @@ var scanFilesCmd = &cobra.Command{
 		if testRun {
 			path = pwd + "/test_data" 
 		}
-		fileNames, err := scanFiles.FindFeatureFiles(path + "/features");
+		fileNames, err := fileHandling.FindFeatureFiles(path + "/features");
 		if err != nil {
 			panic("Feature files could not be found")
 		}
-		fileContents, err := scanFiles.ReadFiles(fileNames)
+		fileContents, err := fileHandling.ReadFiles(fileNames)
 		if err != nil {
 			panic("Could not read files")
 		}

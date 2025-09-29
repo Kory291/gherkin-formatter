@@ -1,4 +1,4 @@
-package scanFiles
+package fileHandling
 
 import (
 	"bufio"
