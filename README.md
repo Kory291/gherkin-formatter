@@ -9,7 +9,7 @@ This will for now be focused on the project structure that is guided by the beha
 
 - [x] be able to scan for all `.feature` files in project structure
 Note: Assumed project structure is that all `.feature` files are in a directory `features/` or in sub-directories within that `feature/` directory.
-- [ ] read feature files that where found and save them
+- [x] read feature files that where found and save them
 
 ### Formatting options
 
