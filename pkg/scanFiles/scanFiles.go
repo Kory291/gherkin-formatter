@@ -30,7 +30,7 @@ func FindFeatureFiles(path string) ([]string, error) {
 	fileNames := []string{}
 	files, err := os.ReadDir(searchPath)
 	if err != nil {
-		return []string{}, errors.New("feature directory not found");
+		return make([]string, 0), errors.New("feature directory not found");
 	}
 
 	for _, file := range files {
@@ -38,6 +38,7 @@ func FindFeatureFiles(path string) ([]string, error) {
 			fileNamesInDir, err := FindFeatureFiles(path + "/" + file.Name())
 			if err != nil {
 				fmt.Printf("Something went wrong while looking up %s", path)
+				return make([]string, 0), err
 			}
 			featureFiles := filterFeatureFiles(fileNamesInDir)
 			fileNames = append(fileNames, featureFiles...)
@@ -67,4 +68,24 @@ func ReadFiles(paths []string) (map[string][]string, error) {
 		resultFiles[path] = textContent
 	}
 	return resultFiles, nil
+}
+
+func WriteFiles(fileContents map[string][]string) error {
+	for path, fileContent := range fileContents {
+		file, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		writer := bufio.NewWriter(file)
+		for _, line := range fileContent {
+			_, err := writer.WriteString(line)
+			if err != nil {
+				writer.Flush()
+				return err
+			}
+		}
+		writer.Flush()
+	}
+	return nil
 }
