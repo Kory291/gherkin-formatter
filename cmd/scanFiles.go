@@ -21,7 +21,15 @@ var scanFilesCmd = &cobra.Command{
 		if err != nil {
 			os.Exit(1);
 		}
-		fileNames, err := scanFiles.FindFeatureFiles(pwd);
+		testRun, err := cmd.Flags().GetBool("test");
+		if err != nil {
+			os.Exit(1);
+		}
+		path := pwd
+		if testRun {
+			path = pwd + "/tests" 
+		}
+		fileNames, err := scanFiles.FindFeatureFiles(path + "/features");
 		if err != nil {
 			os.Exit(1);
 		}
@@ -30,6 +38,7 @@ var scanFilesCmd = &cobra.Command{
 }
 
 func init() {
+	scanFilesCmd.Flags().Bool("test", false, "Enable this when testing the application")
 	rootCmd.AddCommand(scanFilesCmd)
 
 	// Here you will define your flags and configuration settings.
