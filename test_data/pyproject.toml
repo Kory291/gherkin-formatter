@@ -1,0 +1,7 @@
+[project]
+name = "foo"
+version = "1.0.0"
+
+[gherkinFormatter]
+intendation = 4
+intend-and = true
