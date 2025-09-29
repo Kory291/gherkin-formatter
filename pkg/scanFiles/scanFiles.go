@@ -14,13 +14,20 @@ func WhereAmI() (string, error) {
 	return pwd, nil
 }
 
-func FindFeatureFiles(path string) ([]string, error) {
-	searchPath := path;
-	fileNames := []string{}
-	if path == "" {
-		searchPath = "features";
+func filterFeatureFiles(fileNames []string) []string {
+	featureFiles := []string{}
+	for _, fileName := range fileNames {
+		if len(fileName) > 8 && fileName[len(fileName)-8:] == ".feature" {
+			featureFiles = append(featureFiles, fileName)
+		}
 	}
-	files, err := os.ReadDir(searchPath);
+	return featureFiles
+}
+
+func FindFeatureFiles(path string) ([]string, error) {
+	searchPath := path
+	fileNames := []string{}
+	files, err := os.ReadDir(searchPath)
 	if err != nil {
 		return []string{}, errors.New("feature directory not found");
 	}
@@ -29,11 +36,14 @@ func FindFeatureFiles(path string) ([]string, error) {
 		if file.IsDir() {
 			fileNamesInDir, err := FindFeatureFiles(path + "/" + file.Name())
 			if err != nil {
-				fmt.Println("Something went wrong while looking up %s", path)
+				fmt.Printf("Something went wrong while looking up %s", path)
 			}
-			fileNames = append(fileNames, fileNamesInDir...)
+			featureFiles := filterFeatureFiles(fileNamesInDir)
+			fileNames = append(fileNames, featureFiles...)
 		}
-		fileNames = append(fileNames, path + "/" + file.Name())
+		if len(file.Name()) > 8 && file.Name()[len(file.Name())-8:] == ".feature" {
+			fileNames = append(fileNames, path + "/" + file.Name())
+		}
 	}
-	return fileNames, nil;
+	return fileNames, nil
 }
