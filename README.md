@@ -7,8 +7,9 @@ This will for now be focused on the project structure that is guided by the beha
 
 ### Scenario discovery
 
-- [ ] be able to scan for all `.feature` files in project structure
+- [x] be able to scan for all `.feature` files in project structure
 Note: Assumed project structure is that all `.feature` files are in a directory `features/` or in sub-directories within that `feature/` directory.
+- [ ] read feature files that where found and save them
 
 ### Formatting options
 
@@ -20,3 +21,8 @@ This will be 2 spaces for now
 
 - [ ] Have input file to define configuration
 - [ ] Configuration options are supported in `.pyproject.toml`
+- [ ] Have `configure` command available to help configuration
+
+### Building
+
+- [ ] Have a build and release pipeline available
