@@ -1,9 +1,10 @@
 package scanFiles
 
 import (
-	"os"
-	"fmt"
+	"bufio"
 	"errors"
+	"fmt"
+	"os"
 )
 
 func WhereAmI() (string, error) {
@@ -46,4 +47,24 @@ func FindFeatureFiles(path string) ([]string, error) {
 		}
 	}
 	return fileNames, nil
+}
+
+func ReadFiles(paths []string) (map[string][]string, error) {
+	resultFiles := make(map[string][]string)
+	for _, path := range paths {
+		file, err := os.Open(path)
+		if err != nil {
+			fmt.Printf("error when opening file %s", path)
+			return make(map[string][]string, 0), errors.New("file could not be opened")
+		}
+		defer file.Close()
+		scanner := bufio.NewScanner(file)
+		scanner.Split(bufio.ScanLines)
+		textContent := make([]string, 0)
+		for scanner.Scan() {
+			textContent = append(textContent, scanner.Text())
+		}
+		resultFiles[path] = textContent
+	}
+	return resultFiles, nil
 }
