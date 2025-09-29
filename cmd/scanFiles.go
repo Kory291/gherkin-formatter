@@ -27,7 +27,7 @@ var scanFilesCmd = &cobra.Command{
 		}
 		path := pwd
 		if testRun {
-			path = pwd + "/tests" 
+			path = pwd + "/test_data" 
 		}
 		fileNames, err := scanFiles.FindFeatureFiles(path + "/features");
 		if err != nil {
