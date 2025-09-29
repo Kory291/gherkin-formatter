@@ -33,21 +33,20 @@ var scanFilesCmd = &cobra.Command{
 		if err != nil {
 			os.Exit(1);
 		}
-		fmt.Println(fileNames);
+		fileContents, err := scanFiles.ReadFiles(fileNames)
+		if err != nil {
+			os.Exit(1)
+		}
+		for filePath, fileContent := range fileContents {
+			fmt.Println("\n" + filePath)
+			for _, line := range fileContent {
+				fmt.Println(line)
+			}
+		}
 	},
 }
 
 func init() {
 	scanFilesCmd.Flags().Bool("test", false, "Enable this when testing the application")
 	rootCmd.AddCommand(scanFilesCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// scanFilesCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// scanFilesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
