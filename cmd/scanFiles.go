@@ -19,11 +19,11 @@ var scanFilesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		pwd, err := scanFiles.WhereAmI()
 		if err != nil {
-			os.Exit(1);
+			panic("Could not determine current directory")
 		}
 		testRun, err := cmd.Flags().GetBool("test");
 		if err != nil {
-			os.Exit(1);
+			panic("Flag content for 'test' could not be collected")
 		}
 		path := pwd
 		if testRun {
@@ -31,11 +31,11 @@ var scanFilesCmd = &cobra.Command{
 		}
 		fileNames, err := scanFiles.FindFeatureFiles(path + "/features");
 		if err != nil {
-			os.Exit(1);
+			panic("Feature files could not be found")
 		}
 		fileContents, err := scanFiles.ReadFiles(fileNames)
 		if err != nil {
-			os.Exit(1)
+			panic("Could not read files")
 		}
 		for filePath, fileContent := range fileContents {
 			fmt.Println("\n" + filePath)
