@@ -15,8 +15,8 @@ import (
 // configurationCmd represents the configuration command
 var configurationCmd = &cobra.Command{
 	Use:   "configuration",
-	Short: "This command is used to configure the script and read configuration options",
-	Long: `Use this to read configuration options or to set configuration options`,
+	Short: "This command is used to read the current configuration.",
+	Long: `Use this to read configuration options. This also displays the location where the file should be put.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		testRun, err := cmd.Flags().GetBool("test")
 		if err != nil {
@@ -24,12 +24,21 @@ var configurationCmd = &cobra.Command{
 		}
 		if testRun {
 			fmt.Println("Running configuration in test mode")
-			params, err := configuration.ReadConfiguration("test_data/pyproject.toml")
+			params, err := configuration.ReadConfiguration("test_data/")
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println(params)
+			fmt.Println(*params)
+			return
 		}
+		params, err := configuration.ReadConfiguration(".")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Configuration read:")
+		fmt.Printf("intend-and:\t%t\n", params.IntendAnd)
+		fmt.Printf("intendation:\t%d\n", params.Intendation)
+
 	},
 }
 

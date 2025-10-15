@@ -1,38 +1,59 @@
 package configuration
 
 import (
-	"bufio"
-	"os"
+	"errors"
 	"fmt"
 
-	"github.com/pelletier/go-toml/v2"
+	"github.com/spf13/viper"
 )
 
-type gherkinFormatterOptions struct {
-	Intend bool
+type Config struct {
+	IntendAnd bool
 	Intendation int
 }
 
-// type Config struct {
-// 	GherkinFormatter gherkinFormatter `toml:"gherkinFormatter"`
-// }
+var Configuration Config
+var ConfigFileNotFoundError viper.ConfigFileNotFoundError
 
-func ReadConfiguration(path string) (gherkinFormatterOptions, error) {
-	var cfg interface{}
-	file, err := os.Open(path)
+func setDefaults() {
+	viper.SetDefault("intendation" ,4)
+	viper.SetDefault("intend-and", true)
+}
+
+func ReadConfiguration(path string) (*Config, error) {
+
+	setDefaults()
+
+	viper.SetConfigName("gherkinFormatter")
+	viper.AddConfigPath(path)
+	viper.AddConfigPath(".")
+
+	if err := viper.ReadInConfig(); err != nil {
+		if errors.As(err, &ConfigFileNotFoundError) {
+			fmt.Println("Config file not find - will use defauts")
+		} else {
+			return nil, errors.New("something else went wrong here")
+		}
+	}
+
+	Configuration.IntendAnd = viper.GetBool("intend-and")
+	Configuration.Intendation = viper.GetInt("intendation")
+
+	return &Configuration, nil
+}
+
+func WriteConfiguration(path string) (error) {
+
+	viper.AddConfigPath(path)
+	viper.AddConfigPath(".")
+
+	err := viper.SafeWriteConfig()
 	if err != nil {
-		panic(err)
+		return err
 	}
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanRunes)
-	tomlBytes := make([]byte, 0)
-	for scanner.Scan() {
-		tomlBytes = append(tomlBytes, scanner.Bytes()...)
-	}
-	err = toml.Unmarshal(tomlBytes, &cfg)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(cfg)
-	return gherkinFormatterOptions{}, nil
+	return nil
+}
+
+func SetConfiguration(key string, value any) {
+	viper.Set(key, value)
 }
