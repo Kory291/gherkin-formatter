@@ -13,15 +13,24 @@ Note: Assumed project structure is that all `.feature` files are in a directory 
 
 ### Formatting options
 
-- [ ] set default value for intendation
+- [x] set default value for intendation
 This will be 2 spaces for now
 - [ ] set allignment
 
 ### Configuration
 
-- [ ] Have input file to define configuration
+- [x] Have input file to define configuration
 - [ ] Configuration options are supported in `.pyproject.toml`
 - [ ] Have `configure` command available to help configuration
+
+### Formatting
+
+- [ ] Add command `format` to apply configuration
+
+### Code quality
+
+- [ ] Add unit tests
+- [ ] Add linter, unit-tests in CI
 
 ### Building
 

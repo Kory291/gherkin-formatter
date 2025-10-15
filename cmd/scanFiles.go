@@ -26,9 +26,10 @@ var scanFilesCmd = &cobra.Command{
 		}
 		path := pwd
 		if testRun {
+			fmt.Println("Running scanFiles in test mode")
 			path = pwd + "/test_data" 
 		}
-		fileNames, err := fileHandling.FindFeatureFiles(path + "/features");
+		fileNames, err := fileHandling.FindFeatureFiles(path + "/features")
 		if err != nil {
 			panic("Feature files could not be found")
 		}
