@@ -19,9 +19,18 @@ This will be 2 spaces for now
 
 ### Configuration
 
-- [ ] Have input file to define configuration
+- [x] Have input file to define configuration
 - [ ] Configuration options are supported in `.pyproject.toml`
 - [ ] Have `configure` command available to help configuration
+
+### Formatting
+
+- [ ] Add command `format` to apply configuration
+
+### Code quality
+
+- [ ] Add unit tests
+- [ ] Add linter, unit-tests in CI
 
 ### Building
 
