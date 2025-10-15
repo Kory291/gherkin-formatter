@@ -16,7 +16,7 @@ var Configuration Config
 var ConfigFileNotFoundError viper.ConfigFileNotFoundError
 
 func setDefaults() {
-	viper.SetDefault("intendation" ,4)
+	viper.SetDefault("intendation", 2)
 	viper.SetDefault("intend-and", true)
 }
 
