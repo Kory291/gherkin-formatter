@@ -14,3 +14,8 @@ Feature: Some feature with Examples
         | action |
         | not talk bad |
         | not ignore someone |
+    
+    Scenario: Some other scenario
+        Given something
+        When I do something
+        Then I have something
