@@ -52,6 +52,9 @@ func increaseIntendation(line string, currentElement string, previousElement str
 	if (currentElement == "scenario" || currentElement == "tag") && previousElement == "description" {
 		return false
 	}
+	if currentElement == "table" && previousElement != "table" {
+		return true
+	}
 	if previousElement == "feature" || previousElement == "scenario" || previousElement == "background" || previousElement == "examples" {
 		return true
 	}
@@ -61,13 +64,16 @@ func increaseIntendation(line string, currentElement string, previousElement str
 	return (currentElement == "and") && (previousElement != "and")
 }
 
-func decreaseIntendation(line string, currentElement string, configuration configuration.Config) bool {
+func decreaseIntendation(line string, currentElement string, previousElement string, configuration configuration.Config) bool {
 	if !configuration.IntendAnd {
 		return false
 	}
 	line = s.Trim(line, " ")
 	if line == "" {
 		return false
+	}
+	if previousElement == "table" && currentElement != "table" {
+		return true
 	}
 	return currentElement == "scenario" || currentElement == "examples" || currentElement == "tag"
 }
@@ -87,7 +93,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			// fmt.Println("..Increasing intendation")
 			currentIntendation += 1
 		}
-		if decreaseIntendation(line, currentElement, configuration) && currentIntendation > 1 {
+		if decreaseIntendation(line, currentElement, previousFoundElement, configuration) && currentIntendation > 1 {
 			// fmt.Println("..Decreasing intendation")
 			currentIntendation -= 1
 		}
