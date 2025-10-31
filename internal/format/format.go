@@ -5,15 +5,29 @@ import (
 	re "regexp"
 	s "strings"
 
-	"github.com/Kory291/gherkin-formatter/pkg/configuration"
+	"github.com/Kory291/gherkin-formatter/internal/configuration"
 )
 
 func getCurrentGherkinElement(line string) string {
 	line = s.ToLower(s.Trim(line, " "))
+	if line == "" {
+		return ""
+	}
 	currentELementMatcher := re.MustCompile(`^(given\s|when\s|then\s|and\s|feature:|scenario( outline)?:|background:|examples)`)
 	match := currentELementMatcher.FindString(line)
-	match = s.TrimSuffix(match, ":")
-	return s.TrimSuffix(match, " outline")
+	if match != "" {
+		match = s.TrimSuffix(match, ":")
+		return s.TrimSuffix(match, " outline")
+	}
+	tagMatcher := re.MustCompile(`^@[\d\w_-]+`)
+	if tagMatcher.MatchString(line) {
+		return "tag"
+	}
+	tableMatcher := re.MustCompile(`^\|`)
+	if tableMatcher.MatchString(line) {
+		return "table"
+	}
+	return "description"
 }
 
 func increaseIntendation(line string, currentElement string, previousElement string, configuration configuration.Config) bool {
@@ -22,8 +36,20 @@ func increaseIntendation(line string, currentElement string, previousElement str
 	// Feature name -> Feature description
 	// Feature -> Scenario
 	// Scenario -> Given | When | Then
+
+	// Special case for tags:
+	// if a tag was before a scenario, we do not want to increase intendation for the scenario
 	line = s.Trim(line, " ")
 	if line == "" {
+		return false
+	}
+	if currentElement == previousElement {
+		return false
+	}
+	if currentElement == "scenario" && previousElement == "tag" {
+		return false
+	}
+	if (currentElement == "scenario" || currentElement == "tag") && previousElement == "description" {
 		return false
 	}
 	if previousElement == "feature" || previousElement == "scenario" || previousElement == "background" || previousElement == "examples" {
@@ -43,7 +69,7 @@ func decreaseIntendation(line string, currentElement string, configuration confi
 	if line == "" {
 		return false
 	}
-	return currentElement == "scenario" || currentElement == "examples"
+	return currentElement == "scenario" || currentElement == "examples" || currentElement == "tag"
 }
 
 func FormatFile(fileContent []string, configuration configuration.Config) ([]string, error) {
@@ -61,21 +87,15 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			// fmt.Println("..Increasing intendation")
 			currentIntendation += 1
 		}
-		if increaseIntendation(cutLine, currentElement, previousFoundElement, configuration) && currentElement == "scenario" {
-			// fmt.Println("..Increasing intendation")
-			currentIntendation += 1
-		}
 		if decreaseIntendation(line, currentElement, configuration) && currentIntendation > 1 {
-			// fmt.Println("..Decreasing intendation")
-			currentIntendation -= 1
-		}
-		if currentElement == "and" && decreaseIntendation(line, currentElement, configuration) && currentIntendation > 1 {
 			// fmt.Println("..Decreasing intendation")
 			currentIntendation -= 1
 		}
 		newLine := s.Repeat(" ", currentIntendation * configuration.Intendation) + cutLine
 		formattedFileContents = append(formattedFileContents, newLine)
-		previousFoundElement = currentElement
+		if currentElement != "" {
+			previousFoundElement = currentElement
+		}
 	}
 	return formattedFileContents, nil
 }

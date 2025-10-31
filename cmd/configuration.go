@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Kory291/gherkin-formatter/pkg/configuration"
+	"github.com/Kory291/gherkin-formatter/internal/configuration"
 )
 
 // configurationCmd represents the configuration command

@@ -5,9 +5,9 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/Kory291/gherkin-formatter/pkg/fileHandling"
-	"github.com/Kory291/gherkin-formatter/pkg/format"
-	"github.com/Kory291/gherkin-formatter/pkg/configuration"
+	"github.com/Kory291/gherkin-formatter/internal/fileHandling"
+	"github.com/Kory291/gherkin-formatter/internal/format"
+	"github.com/Kory291/gherkin-formatter/internal/configuration"
 	"github.com/spf13/cobra"
 
 	"fmt"
