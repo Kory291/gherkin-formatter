@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Kory291/gherkin-formatter/pkg/fileHandling"
+	"github.com/Kory291/gherkin-formatter/internal/fileHandling"
 	"github.com/spf13/cobra"
 )
 
