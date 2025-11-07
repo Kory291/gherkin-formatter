@@ -10,13 +10,29 @@ permissions:
   contents: write
 
 jobs:
+  generate_changelog:
+    name: Create and commit generate changelog
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/git-chglog/git-chglog:latest
+      volumes:
+        - .:/workdir
+    steps:
+      - name: Create changelog
+        run: |
+          git-chglog --output CHANGELOG.md
+      - name: Commit changes to main
+        env:
+          tag: ${{ github.ref_name }}
+        run: |
+          git checkout main
+          git add CHANGELOG.md
+          git commit -m "chore(new-version): update changelog for $tag"
+          git push
   release:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-      - name: Generate changelog
-        run: |
-          git-chglog
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
