@@ -1,0 +1,27 @@
+name: Publish docker image
+
+on:
+  push:  
+    branches:
+       - master
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    container: docker:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+      
+      - name: Build image
+        run: |
+          echo ${{ secrets.REGISTRY_TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+          docker build -t ghcr.io/kory291/gherkin-formatter:latest .
+          docker push ghcr.io/kory291/gherkin-formatter:latest
