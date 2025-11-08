@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Create changelog
         run: |
+          ls -la
           git-chglog --output CHANGELOG.md
       - name: Commit changes to main
         env:
