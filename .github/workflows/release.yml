@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: quay.io/git-chglog/git-chglog:latest
-      volumes:
-        - .:/workdir
+      # volumes:
+      #   - .:/workdir
     steps:
       - name: Create changelog
         run: |
