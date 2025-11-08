@@ -18,6 +18,8 @@ jobs:
       # volumes:
       #   - .:/workdir
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Create changelog
         run: |
           ls -la
