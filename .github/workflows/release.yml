@@ -24,10 +24,8 @@ jobs:
           fetch-depth: 0
       - name: Create changelog
         run: |
-          git config --add safe.directory $PWD
           ls -la
           pwd
-          git tag -l
           git-chglog --output CHANGELOG.md
       - name: Commit changes to main
         env:
