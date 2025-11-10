@@ -25,7 +25,9 @@ This will be 2 spaces for now
 
 ### Formatting
 
-- [ ] Add command `format` to apply configuration
+- [x] Add command `format` to apply configuration
+- [ ] Add support to extend tags
+- [ ] Add handling of multiple empty lines
 
 ### Code quality
 
@@ -34,4 +36,4 @@ This will be 2 spaces for now
 
 ### Building
 
-- [ ] Have a build and release pipeline available
+- [x] Have a build and release pipeline available
