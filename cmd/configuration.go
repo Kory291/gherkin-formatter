@@ -37,7 +37,7 @@ var configurationCmd = &cobra.Command{
 		fmt.Println("Configuration read:")
 		fmt.Printf("intend-and:\t%t\n", params.IntendAnd)
 		fmt.Printf("intendation:\t%d\n", params.Intendation)
-
+		fmt.Printf("sort-tags:\t%d\n", params.SortTags)
 	},
 }
 

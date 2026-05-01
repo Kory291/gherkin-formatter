@@ -116,8 +116,9 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 					break
 				}
 			}
-
-			slices.Sort(tags)
+			if configuration.SortTags {
+				slices.Sort(tags)
+			}
 		}
 
 		if currentElement == "tag" && previousFoundElement == "tag" {

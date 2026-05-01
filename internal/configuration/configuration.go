@@ -10,6 +10,7 @@ import (
 type Config struct {
 	IntendAnd   bool
 	Intendation int
+	SortTags    bool
 }
 
 var Configuration Config
@@ -18,6 +19,7 @@ var ConfigFileNotFoundError viper.ConfigFileNotFoundError
 func setDefaults() {
 	viper.SetDefault("intendation", 2)
 	viper.SetDefault("intend-and", true)
+	viper.SetDefault("sort-tags", true)
 }
 
 func ReadConfiguration(path string) (*Config, error) {
@@ -38,6 +40,7 @@ func ReadConfiguration(path string) (*Config, error) {
 
 	Configuration.IntendAnd = viper.GetBool("intend-and")
 	Configuration.Intendation = viper.GetInt("intendation")
+	Configuration.SortTags = viper.GetBool("sort-tags")
 
 	return &Configuration, nil
 }
