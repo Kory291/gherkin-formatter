@@ -34,7 +34,30 @@ var configurationCmd = &cobra.Command{
 	},
 }
 
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "This command is used to create a init configuraton file.",
+	Long:  "Use this command to create a basic configuration file in your project with all the default values",
+	Run: func(cmd *cobra.Command, args []string) {
+		testRun, err := cmd.Flags().GetBool("test")
+		if err != nil {
+			panic(err)
+		}
+		configDir := "."
+		if testRun {
+			fmt.Println("Running configuration in test mode")
+			configDir = "test_data/"
+		}
+		err = configuration.CreateConfiguration(configDir)
+		if err != nil {
+			panic(err)
+		}
+	},
+}
+
 func init() {
 	configurationCmd.Flags().Bool("test", false, "Use this flag if you test the script")
+	initCmd.Flags().Bool("test", false, "Use this flag if you test the script")
+	configurationCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(configurationCmd)
 }

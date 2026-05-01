@@ -22,13 +22,18 @@ func setDefaults() {
 	viper.SetDefault("sort-tags", true)
 }
 
-func ReadConfiguration(path string) (*Config, error) {
-
-	setDefaults()
+func setConfigPaths(path string) {
 
 	viper.SetConfigName("gherkinFormatter")
 	viper.AddConfigPath(path)
 	viper.AddConfigPath(".")
+
+}
+
+func ReadConfiguration(path string) (*Config, error) {
+
+	setDefaults()
+	setConfigPaths(path)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if errors.As(err, &ConfigFileNotFoundError) {
@@ -47,8 +52,7 @@ func ReadConfiguration(path string) (*Config, error) {
 
 func WriteConfiguration(path string) error {
 
-	viper.AddConfigPath(path)
-	viper.AddConfigPath(".")
+	setConfigPaths(path)
 
 	err := viper.SafeWriteConfig()
 	if err != nil {
@@ -59,6 +63,12 @@ func WriteConfiguration(path string) error {
 
 func SetConfiguration(key string, value any) {
 	viper.Set(key, value)
+}
+
+func CreateConfiguration(configDir string) error {
+	setDefaults()
+	viper.SetConfigType("toml")
+	return WriteConfiguration(configDir)
 }
 
 func PrintConfiguration(configuration *Config) {
