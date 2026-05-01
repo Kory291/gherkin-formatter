@@ -4,12 +4,15 @@ Feature: Some feature name here
  Background: Some general steps here
     Given I have something
     When I do something
+ 
 
-@tag1
+  @tag4  
+@tag3
+@tag1 @tag2
 Scenario: Result 1
     Then something happens
 
-@tag2
+@tag5
 Scenario: Result 2
     Then something else happens
 
