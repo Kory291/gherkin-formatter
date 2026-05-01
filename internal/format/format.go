@@ -3,6 +3,7 @@ package format
 import (
 	// "fmt"
 	re "regexp"
+	"slices"
 	s "strings"
 
 	"github.com/Kory291/gherkin-formatter/internal/configuration"
@@ -19,7 +20,7 @@ func getCurrentGherkinElement(line string) string {
 		match = s.TrimSuffix(match, ":")
 		return s.TrimSuffix(match, " outline")
 	}
-	tagMatcher := re.MustCompile(`^@[\d\w_-]+`)
+	tagMatcher := re.MustCompile(`^@[\d\w_.-]+`)
 	if tagMatcher.MatchString(line) {
 		return "tag"
 	}
@@ -78,27 +79,80 @@ func decreaseIntendation(line string, currentElement string, previousElement str
 	return currentElement == "scenario" || currentElement == "examples" || currentElement == "tag"
 }
 
+func addNewLine(currentElement string, previousElement string, configuration configuration.Config) bool {
+	return (previousElement != currentElement) && (previousElement != "tag") && (currentElement == "scenario" || currentElement == "background" || currentElement == "examples" || currentElement == "tag")
+}
+
 func FormatFile(fileContent []string, configuration configuration.Config) ([]string, error) {
 	currentIntendation := 0
 	formattedFileContents := make([]string, 0)
-	// tagMatcher := re.MustCompile(`@[\d\w_-]+`)
+	// tagMatcher := re.MustCompile(`@[\d\w_-.]+`)
+
 	var previousFoundElement string
 
-
-	for _, line := range fileContent {
+	for lineNumber, line := range fileContent {
 		cutLine := s.Trim(line, " ")
 
+		if cutLine == "" {
+			continue
+		}
+
+		tags := []string{}
+
 		currentElement := getCurrentGherkinElement(cutLine)
+		// see if there are more tags in the following lines
+		if currentElement == "tag" && previousFoundElement != "tag" {
+			tagsMatches := re.MustCompile(`@[\d\w_.-]+`)
+
+			// go to next lines
+			for _, nextLine := range fileContent[lineNumber:] {
+				lineTags := tagsMatches.FindAllString(nextLine, -1)
+
+				tags = append(tags, lineTags...)
+
+				nextElement := getCurrentGherkinElement(nextLine)
+				// no tag following anymore can do other stuff
+				if nextElement != "tag" {
+					break
+				}
+			}
+			if configuration.SortTags {
+				slices.Sort(tags)
+			}
+		}
+
+		if currentElement == "tag" && previousFoundElement == "tag" {
+			continue
+		}
+
+		// check if indentation has to be increased
 		if increaseIntendation(cutLine, currentElement, previousFoundElement, configuration) {
 			// fmt.Println("..Increasing intendation")
 			currentIntendation += 1
 		}
+
+		// check if intendation has to be decreased
 		if decreaseIntendation(line, currentElement, previousFoundElement, configuration) && currentIntendation > 1 {
 			// fmt.Println("..Decreasing intendation")
 			currentIntendation -= 1
 		}
-		newLine := s.Repeat(" ", currentIntendation * configuration.Intendation) + cutLine
-		formattedFileContents = append(formattedFileContents, newLine)
+
+		if addNewLine(currentElement, previousFoundElement, configuration) {
+			formattedFileContents = append(formattedFileContents, "")
+		}
+
+		// set the new line with the required numbers of whitespaces
+		newLine := s.Repeat(" ", currentIntendation*configuration.Intendation) + cutLine
+
+		if len(tags) > 0 {
+			for _, tag := range tags {
+				newLine := s.Repeat(" ", currentIntendation*configuration.Intendation) + tag
+				formattedFileContents = append(formattedFileContents, newLine)
+			}
+		} else {
+			formattedFileContents = append(formattedFileContents, newLine)
+		}
+
 		if currentElement != "" {
 			previousFoundElement = currentElement
 		}

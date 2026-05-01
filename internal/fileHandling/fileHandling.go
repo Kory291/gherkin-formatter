@@ -8,9 +8,9 @@ import (
 )
 
 func WhereAmI() (string, error) {
-	pwd, envPresent := os.LookupEnv("PWD");
+	pwd, envPresent := os.LookupEnv("PWD")
 	if !envPresent {
-		return "", errors.New("PWD variable not found");
+		return "", errors.New("PWD variable not found")
 	}
 	return pwd, nil
 }
@@ -30,7 +30,7 @@ func FindFeatureFiles(path string) ([]string, error) {
 	fileNames := []string{}
 	files, err := os.ReadDir(searchPath)
 	if err != nil {
-		return make([]string, 0), errors.New("feature directory not found");
+		return make([]string, 0), errors.New("feature directory not found")
 	}
 
 	for _, file := range files {
@@ -44,7 +44,7 @@ func FindFeatureFiles(path string) ([]string, error) {
 			fileNames = append(fileNames, featureFiles...)
 		}
 		if len(file.Name()) > 8 && file.Name()[len(file.Name())-8:] == ".feature" {
-			fileNames = append(fileNames, path + "/" + file.Name())
+			fileNames = append(fileNames, path+"/"+file.Name())
 		}
 	}
 	return fileNames, nil
