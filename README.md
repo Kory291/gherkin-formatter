@@ -26,13 +26,17 @@ This will be 2 spaces for now
 ### Formatting
 
 - [x] Add command `format` to apply configuration
-- [ ] Add support to extend tags
-- [ ] Add handling of multiple empty lines
+- [x] Add support to extend tags
+- [x] Add handling of multiple empty lines
 
 ### Code quality
 
 - [ ] Add unit tests
 - [ ] Add linter, unit-tests in CI
+
+### Misc
+
+- [ ] Have logging
 
 ### Building
 
