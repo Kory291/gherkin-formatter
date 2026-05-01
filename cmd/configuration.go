@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -16,7 +15,7 @@ import (
 var configurationCmd = &cobra.Command{
 	Use:   "configuration",
 	Short: "This command is used to read the current configuration.",
-	Long: `Use this to read configuration options. This also displays the location where the file should be put.`,
+	Long:  `Use this to read configuration options. This also displays the location where the file should be put.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		testRun, err := cmd.Flags().GetBool("test")
 		if err != nil {

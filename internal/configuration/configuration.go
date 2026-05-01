@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	IntendAnd bool
+	IntendAnd   bool
 	Intendation int
 }
 
@@ -42,7 +42,7 @@ func ReadConfiguration(path string) (*Config, error) {
 	return &Configuration, nil
 }
 
-func WriteConfiguration(path string) (error) {
+func WriteConfiguration(path string) error {
 
 	viper.AddConfigPath(path)
 	viper.AddConfigPath(".")

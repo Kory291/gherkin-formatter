@@ -3,8 +3,8 @@ package format
 import (
 	// "fmt"
 	re "regexp"
-	s "strings"
 	"slices"
+	s "strings"
 
 	"github.com/Kory291/gherkin-formatter/internal/configuration"
 )
@@ -80,7 +80,7 @@ func decreaseIntendation(line string, currentElement string, previousElement str
 }
 
 func addNewLine(currentElement string, previousElement string, configuration configuration.Config) bool {
-	return (previousElement != currentElement) && (previousElement != "tag") && (currentElement == "scenario" || currentElement == "background" || currentElement == "examples" || currentElement == "tag")	
+	return (previousElement != currentElement) && (previousElement != "tag") && (currentElement == "scenario" || currentElement == "background" || currentElement == "examples" || currentElement == "tag")
 }
 
 func FormatFile(fileContent []string, configuration configuration.Config) ([]string, error) {
@@ -103,10 +103,10 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		// see if there are more tags in the following lines
 		if currentElement == "tag" && previousFoundElement != "tag" {
 			tagsMatches := re.MustCompile(`@[\d\w_.-]+`)
-			
+
 			// go to next lines
 			for _, nextLine := range fileContent[lineNumber:] {
-				lineTags := tagsMatches.FindAllString(nextLine, -1)			
+				lineTags := tagsMatches.FindAllString(nextLine, -1)
 
 				tags = append(tags, lineTags...)
 
@@ -116,8 +116,8 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 					break
 				}
 			}
-			
-			slices.Sort(tags)				
+
+			slices.Sort(tags)
 		}
 
 		if currentElement == "tag" && previousFoundElement == "tag" {
@@ -141,13 +141,13 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		// set the new line with the required numbers of whitespaces
-		newLine := s.Repeat(" ", currentIntendation * configuration.Intendation) + cutLine
-		
+		newLine := s.Repeat(" ", currentIntendation*configuration.Intendation) + cutLine
+
 		if len(tags) > 0 {
 			for _, tag := range tags {
-				newLine := s.Repeat(" ", currentIntendation * configuration.Intendation) + tag
+				newLine := s.Repeat(" ", currentIntendation*configuration.Intendation) + tag
 				formattedFileContents = append(formattedFileContents, newLine)
-			} 
+			}
 		} else {
 			formattedFileContents = append(formattedFileContents, newLine)
 		}
