@@ -60,3 +60,11 @@ func WriteConfiguration(path string) error {
 func SetConfiguration(key string, value any) {
 	viper.Set(key, value)
 }
+
+func PrintConfiguration(configuration *Config) {
+	fmt.Println("Configuration read:")
+	fmt.Printf("intend-and:\t%t\n", configuration.IntendAnd)
+	fmt.Printf("intendation:\t%d\n", configuration.Intendation)
+	fmt.Printf("sort-tags:\t%t\n", configuration.SortTags)
+
+}
