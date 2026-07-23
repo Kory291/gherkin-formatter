@@ -21,7 +21,7 @@ This will be 2 spaces for now
 
 - [x] Have input file to define configuration
 - [ ] Configuration options are supported in `.pyproject.toml`
-- [ ] Have `configure` command available to help configuration
+- [x] Have `configuration init` command available to help configuration
 
 ### Formatting
 

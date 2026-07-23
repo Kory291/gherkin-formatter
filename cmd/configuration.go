@@ -21,27 +21,43 @@ var configurationCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
+		configDir := "."
 		if testRun {
 			fmt.Println("Running configuration in test mode")
-			params, err := configuration.ReadConfiguration("test_data/")
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println(*params)
-			return
+			configDir = "test_data/"
 		}
-		params, err := configuration.ReadConfiguration(".")
+		params, err := configuration.ReadConfiguration(configDir)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("Configuration read:")
-		fmt.Printf("intend-and:\t%t\n", params.IntendAnd)
-		fmt.Printf("intendation:\t%d\n", params.Intendation)
-		fmt.Printf("sort-tags:\t%d\n", params.SortTags)
+		configuration.PrintConfiguration(params)
+	},
+}
+
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "This command is used to create a init configuraton file.",
+	Long:  "Use this command to create a basic configuration file in your project with all the default values",
+	Run: func(cmd *cobra.Command, args []string) {
+		testRun, err := cmd.Flags().GetBool("test")
+		if err != nil {
+			panic(err)
+		}
+		configDir := "."
+		if testRun {
+			fmt.Println("Running configuration in test mode")
+			configDir = "test_data/"
+		}
+		err = configuration.CreateConfiguration(configDir)
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 
 func init() {
 	configurationCmd.Flags().Bool("test", false, "Use this flag if you test the script")
+	initCmd.Flags().Bool("test", false, "Use this flag if you test the script")
+	configurationCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(configurationCmd)
 }
