@@ -18,11 +18,15 @@ func WhereAmI() (string, error) {
 func filterFeatureFiles(fileNames []string) []string {
 	featureFiles := []string{}
 	for _, fileName := range fileNames {
-		if len(fileName) > 8 && fileName[len(fileName)-8:] == ".feature" {
+		if isFeatureFile(fileName) {
 			featureFiles = append(featureFiles, fileName)
 		}
 	}
 	return featureFiles
+}
+
+func isFeatureFile(filename string) bool {
+	return len(filename) > 8 && filename[len(filename)-8:] == ".feature"
 }
 
 func FindFeatureFiles(path string) ([]string, error) {
@@ -43,8 +47,8 @@ func FindFeatureFiles(path string) ([]string, error) {
 			featureFiles := filterFeatureFiles(fileNamesInDir)
 			fileNames = append(fileNames, featureFiles...)
 		}
-		if len(file.Name()) > 8 && file.Name()[len(file.Name())-8:] == ".feature" {
-			fileNames = append(fileNames, path+"/"+file.Name())
+			if isFeatureFile(file.Name()) {
+				fileNames = append(fileNames, path+"/"+file.Name())
 		}
 	}
 	return fileNames, nil
