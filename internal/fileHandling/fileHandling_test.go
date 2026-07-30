@@ -31,6 +31,3 @@ func TestIsFeatureFile(t *testing.T) {
 	} 
 }
 
-func TestFindFeatureFiles(t *testing.T) {
-	
-}
