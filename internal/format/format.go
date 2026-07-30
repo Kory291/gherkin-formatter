@@ -1,7 +1,6 @@
 package format
 
 import (
-	// "fmt"
 	re "regexp"
 	"slices"
 	s "strings"
@@ -9,29 +8,72 @@ import (
 	"github.com/Kory291/gherkin-formatter/internal/configuration"
 )
 
-func getCurrentGherkinElement(line string) string {
-	line = s.ToLower(s.Trim(line, " "))
-	if line == "" {
-		return ""
-	}
-	currentELementMatcher := re.MustCompile(`^(given\s|when\s|then\s|and\s|feature:|scenario( outline)?:|background:|examples)`)
-	match := currentELementMatcher.FindString(line)
-	if match != "" {
-		match = s.TrimSuffix(match, ":")
-		return s.TrimSuffix(match, " outline")
-	}
-	tagMatcher := re.MustCompile(`^@[\d\w_.-]+`)
-	if tagMatcher.MatchString(line) {
-		return "tag"
-	}
-	tableMatcher := re.MustCompile(`^\|`)
-	if tableMatcher.MatchString(line) {
-		return "table"
-	}
-	return "description"
+type Element int
+
+const (
+	ElementGiven Element = iota
+	ElementWhen
+	ElementThen
+	ElementAnd
+	ElementFeature
+	ElementScenario
+	ElementBackground
+	ElementExamples
+	ElementDescription
+	ElementTag
+	ElementEmpty
+	ElementTable
+)
+
+var ElementRegex = map[Element]string{
+	ElementGiven: `^given\s`,
+	ElementWhen: `^when\s`,
+	ElementThen: `^then\s`,
+	ElementAnd: `^and\s`,
+	ElementFeature: `^feature:`,
+	ElementScenario: `^scenario( outline)?:`,
+	ElementBackground: `^background:`,
+	ElementExamples: `^examples`,
+	ElementDescription: ``,
+	ElementTag: `^@[\d\w_.-]`,
+	ElementTable: `^\|`,
+	ElementEmpty: ``,
 }
 
-func increaseIntendation(line string, currentElement string, previousElement string, configuration configuration.Config) bool {
+func getCurrentGherkinElement(line string) Element {
+	line = s.ToLower(s.Trim(line, " "))
+	if line == "" {
+		return ElementEmpty
+	}
+
+	for element, regex := range ElementRegex {
+		elementMatcher := re.MustCompile(regex)
+		match := elementMatcher.FindString(line)
+		if match == "" {
+			continue
+		}
+		return element
+	}  
+
+	// currentELementMatcher := re.MustCompile(`^(given\s|when\s|then\s|and\s|feature:|scenario( outline)?:|background:|examples)`)
+	// match := currentELementMatcher.FindString(line)
+	// if match != "" {
+	// 	match = s.TrimSuffix(match, ":")
+	// 	return s.TrimSuffix(match, " outline")
+	// }
+	// tagMatcher := re.MustCompile(`^@[\d\w_.-]+`)
+	// if tagMatcher.MatchString(line) {
+	// 	return "tag"
+	// }
+	// tableMatcher := re.MustCompile(ElementRegex[ElementTable])
+	// if tableMatcher.MatchString(line) {
+	// 	return "table"
+	// }
+	// return "description"
+	return ElementDescription
+}
+
+func increaseIntendation(line string, currentElement Element, previousElement Element, configuration configuration.Config) bool {
 	// find in which line we are
 	// this is important if we have a change in the following cases:
 	// Feature name -> Feature description
@@ -47,25 +89,25 @@ func increaseIntendation(line string, currentElement string, previousElement str
 	if currentElement == previousElement {
 		return false
 	}
-	if currentElement == "scenario" && previousElement == "tag" {
+	if currentElement == ElementScenario && previousElement == ElementTag {
 		return false
 	}
-	if (currentElement == "scenario" || currentElement == "tag") && previousElement == "description" {
+	if (currentElement == ElementScenario || currentElement == ElementTag) && previousElement == ElementDescription {
 		return false
 	}
-	if currentElement == "table" && previousElement != "table" {
+	if currentElement == ElementTable && previousElement != ElementTable {
 		return true
 	}
-	if previousElement == "feature" || previousElement == "scenario" || previousElement == "background" || previousElement == "examples" {
+	if previousElement == ElementFeature || previousElement == ElementScenario || previousElement == ElementBackground || previousElement == ElementExamples {
 		return true
 	}
 	if !configuration.IntendAnd {
 		return false
 	}
-	return (currentElement == "and") && (previousElement != "and")
+	return (currentElement == ElementAnd) && (previousElement != ElementAnd)
 }
 
-func decreaseIntendation(line string, currentElement string, previousElement string, configuration configuration.Config) bool {
+func decreaseIntendation(line string, currentElement Element, previousElement Element, configuration configuration.Config) bool {
 	if !configuration.IntendAnd {
 		return false
 	}
@@ -73,22 +115,21 @@ func decreaseIntendation(line string, currentElement string, previousElement str
 	if line == "" {
 		return false
 	}
-	if previousElement == "table" && currentElement != "table" {
+	if previousElement == ElementTable && currentElement != ElementTable {
 		return true
 	}
-	return currentElement == "scenario" || currentElement == "examples" || currentElement == "tag"
+	return currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag
 }
 
-func addNewLine(currentElement string, previousElement string, configuration configuration.Config) bool {
-	return (previousElement != currentElement) && (previousElement != "tag") && (currentElement == "scenario" || currentElement == "background" || currentElement == "examples" || currentElement == "tag")
+func addNewLine(currentElement Element, previousElement Element, configuration configuration.Config) bool {
+	return (previousElement != currentElement) && (previousElement != ElementTag) && (currentElement == ElementScenario || currentElement == ElementBackground || currentElement == ElementExamples || currentElement == ElementTag)
 }
 
 func FormatFile(fileContent []string, configuration configuration.Config) ([]string, error) {
 	currentIntendation := 0
 	formattedFileContents := make([]string, 0)
-	// tagMatcher := re.MustCompile(`@[\d\w_-.]+`)
 
-	var previousFoundElement string
+	var previousFoundElement Element
 
 	for lineNumber, line := range fileContent {
 		cutLine := s.Trim(line, " ")
@@ -101,7 +142,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 
 		currentElement := getCurrentGherkinElement(cutLine)
 		// see if there are more tags in the following lines
-		if currentElement == "tag" && previousFoundElement != "tag" {
+		if currentElement == ElementTag && previousFoundElement != ElementTag {
 			tagsMatches := re.MustCompile(`@[\d\w_.-]+`)
 
 			// go to next lines
@@ -112,7 +153,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 
 				nextElement := getCurrentGherkinElement(nextLine)
 				// no tag following anymore can do other stuff
-				if nextElement != "tag" {
+				if nextElement != ElementTag {
 					break
 				}
 			}
@@ -121,7 +162,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			}
 		}
 
-		if currentElement == "tag" && previousFoundElement == "tag" {
+		if currentElement == ElementTag && previousFoundElement == ElementTag {
 			continue
 		}
 
@@ -153,7 +194,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			formattedFileContents = append(formattedFileContents, newLine)
 		}
 
-		if currentElement != "" {
+		if currentElement != ElementEmpty {
 			previousFoundElement = currentElement
 		}
 	}
