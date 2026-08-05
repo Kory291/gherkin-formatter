@@ -73,7 +73,7 @@ func getCurrentGherkinElement(line string) Element {
 	return ElementDescription
 }
 
-func increaseIntendation(line string, currentElement Element, previousElement Element, configuration configuration.Config) bool {
+func increaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) bool {
 	// find in which line we are
 	// this is important if we have a change in the following cases:
 	// Feature name -> Feature description
@@ -82,8 +82,8 @@ func increaseIntendation(line string, currentElement Element, previousElement El
 
 	// Special case for tags:
 	// if a tag was before a scenario, we do not want to increase intendation for the scenario
-	line = s.Trim(line, " ")
-	if line == "" {
+	
+	if currentElement == ElementEmpty {
 		return false
 	}
 	if currentElement == previousElement {
@@ -107,12 +107,11 @@ func increaseIntendation(line string, currentElement Element, previousElement El
 	return (currentElement == ElementAnd) && (previousElement != ElementAnd)
 }
 
-func decreaseIntendation(line string, currentElement Element, previousElement Element, configuration configuration.Config) bool {
-	if !configuration.IntendAnd {
-		return false
+func decreaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) bool {
+	if configuration.IntendAnd && previousElement == ElementAnd && currentElement != ElementAnd {
+		return true
 	}
-	line = s.Trim(line, " ")
-	if line == "" {
+	if currentElement == ElementEmpty {
 		return false
 	}
 	if previousElement == ElementTable && currentElement != ElementTable {
@@ -121,7 +120,7 @@ func decreaseIntendation(line string, currentElement Element, previousElement El
 	return currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag
 }
 
-func addNewLine(currentElement Element, previousElement Element, configuration configuration.Config) bool {
+func addNewLine(currentElement Element, previousElement Element) bool {
 	return (previousElement != currentElement) && (previousElement != ElementTag) && (currentElement == ElementScenario || currentElement == ElementBackground || currentElement == ElementExamples || currentElement == ElementTag)
 }
 
@@ -167,18 +166,18 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		// check if indentation has to be increased
-		if increaseIntendation(cutLine, currentElement, previousFoundElement, configuration) {
+		if increaseIntendation(currentElement, previousFoundElement, configuration) {
 			// fmt.Println("..Increasing intendation")
 			currentIntendation += 1
 		}
 
 		// check if intendation has to be decreased
-		if decreaseIntendation(line, currentElement, previousFoundElement, configuration) && currentIntendation > 1 {
+		if decreaseIntendation(currentElement, previousFoundElement, configuration) && currentIntendation > 1 {
 			// fmt.Println("..Decreasing intendation")
 			currentIntendation -= 1
 		}
 
-		if addNewLine(currentElement, previousFoundElement, configuration) {
+		if addNewLine(currentElement, previousFoundElement) {
 			formattedFileContents = append(formattedFileContents, "")
 		}
 
