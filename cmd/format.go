@@ -64,6 +64,7 @@ var formatCmd = &cobra.Command{
 			formattedFiles[filePath] = formattedFile
 		}
 		if writeFlag {
+			fileHandling.WriteFiles(formattedFiles)
 			return
 		}
 		for filePath, formattedFile := range formattedFiles {

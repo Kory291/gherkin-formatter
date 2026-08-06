@@ -23,11 +23,9 @@ func setDefaults() {
 }
 
 func setConfigPaths(path string) {
-
 	viper.SetConfigName("gherkinFormatter")
 	viper.AddConfigPath(path)
 	viper.AddConfigPath(".")
-
 }
 
 func ReadConfiguration(path string) (*Config, error) {
@@ -76,5 +74,4 @@ func PrintConfiguration(configuration *Config) {
 	fmt.Printf("intend-and:\t%t\n", configuration.IntendAnd)
 	fmt.Printf("intendation:\t%d\n", configuration.Intendation)
 	fmt.Printf("sort-tags:\t%t\n", configuration.SortTags)
-
 }
