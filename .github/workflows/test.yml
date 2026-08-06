@@ -2,7 +2,8 @@ name: Test application
 
 on:
   push:
-    branches: "*"
+    branches:
+      - "*"
   workflow_dispatch:
 
 jobs:
