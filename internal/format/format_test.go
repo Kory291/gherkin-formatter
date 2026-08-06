@@ -80,3 +80,27 @@ func TestDecreaseIntendation(t *testing.T) {
 		}
 	}
 }
+
+func TestAddNewLine(t *testing.T) {
+	// Define test cases
+	testCases := []struct {
+		currentElement  Element
+		previousElement Element
+		expected        bool
+	}{
+		{ElementScenario, ElementFeature, true},
+		{ElementBackground, ElementFeature, true},
+		{ElementExamples, ElementScenario, true},
+		{ElementTag, ElementFeature, true},
+		{ElementGiven, ElementScenario, false},
+		{ElementWhen, ElementGiven, false},
+		{ElementThen, ElementWhen, false},
+	}
+
+	for _, tc := range testCases {
+		actual := addNewLine(tc.currentElement, tc.previousElement)
+		if actual != tc.expected {
+			t.Errorf("For currentElement %v and previousElement %v, expected %v but got %v", tc.currentElement, tc.previousElement, tc.expected, actual)
+		}
+	}
+}
