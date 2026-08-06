@@ -53,3 +53,30 @@ func TestIncreaseIntendation(t *testing.T) {
 		}
 	}
 }
+
+func TestDecreaseIntendation(t *testing.T) {
+	// Define test cases
+	testCases := []struct {
+		currentElement  Element
+		previousElement Element
+		expected        bool
+	}{
+		{ElementGiven, ElementAnd, true},
+		{ElementWhen, ElementAnd, true},
+		{ElementThen, ElementAnd, true},
+		{ElementAnd, ElementGiven, false},
+		{ElementAnd, ElementWhen, false},
+		{ElementEmpty, ElementAnd, false},
+		{ElementScenario, ElementThen, true},
+		{ElementGiven, ElementGiven, false},
+		{ElementWhen, ElementWhen, false},
+		{ElementThen, ElementThen, false},
+	}
+
+	for _, tc := range testCases {
+		actual := decreaseIntendation(tc.currentElement, tc.previousElement, configuration.Config{IntendAnd: true})
+		if actual != tc.expected {
+			t.Errorf("For currentElement %v and previousElement %v, expected %v but got %v", tc.currentElement, tc.previousElement, tc.expected, actual)
+		}
+	}
+}

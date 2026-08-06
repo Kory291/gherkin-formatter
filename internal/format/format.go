@@ -108,11 +108,11 @@ func increaseIntendation(currentElement Element, previousElement Element, config
 }
 
 func decreaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) bool {
-	if configuration.IntendAnd && previousElement == ElementAnd && currentElement != ElementAnd {
-		return true
-	}
 	if currentElement == ElementEmpty {
 		return false
+	}
+	if configuration.IntendAnd && previousElement == ElementAnd && currentElement != ElementAnd {
+		return true
 	}
 	if previousElement == ElementTable && currentElement != ElementTable {
 		return true
