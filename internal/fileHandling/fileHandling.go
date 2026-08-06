@@ -83,7 +83,7 @@ func WriteFiles(fileContents map[string][]string) error {
 		defer file.Close()
 		writer := bufio.NewWriter(file)
 		for _, line := range fileContent {
-			_, err := writer.WriteString(line)
+			_, err := writer.WriteString(line + "\n")
 			if err != nil {
 				writer.Flush()
 				return err
