@@ -1,7 +1,28 @@
 # Gherkin Formatter
 
-This project still is very much work in progress. But I want to try to have a formatter for Gherkin.
+This project still is somewhat work in progress - depends on my motivation.
 This will for now be focused on the project structure that is guided by the behave package since it is the domain I want to use this in.
+
+## How to use:
+
+To just get an idea what will be done: 
+```
+go run github.com/Kory291/gherkin-formatt format
+```
+
+
+If your sure what you are doing you can also run:
+```
+go run github.com/Kory291/gherkin-formatt format --write
+```
+This will write to the .feature files that were found.
+
+
+## Installation
+
+```
+go intall github.com/Kory291/gherkin-formatter
+```
 
 ## ToDo
 
