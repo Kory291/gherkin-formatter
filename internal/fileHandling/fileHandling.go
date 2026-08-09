@@ -62,7 +62,12 @@ func ReadFiles(paths []string) (map[string][]string, error) {
 			fmt.Printf("error when opening file %s", path)
 			return make(map[string][]string, 0), errors.New("file could not be opened")
 		}
-		defer file.Close()
+		defer func() {
+			err = file.Close()
+			if err != nil {
+				panic(err)
+			}
+		}()
 		scanner := bufio.NewScanner(file)
 		scanner.Split(bufio.ScanLines)
 		textContent := make([]string, 0)
@@ -80,16 +85,26 @@ func WriteFiles(fileContents map[string][]string) error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
+		defer func() {
+			if err := file.Close(); err != nil {
+				panic(err)
+			}
+		}()
 		writer := bufio.NewWriter(file)
 		for _, line := range fileContent {
 			_, err := writer.WriteString(line + "\n")
 			if err != nil {
-				writer.Flush()
+				flushError := writer.Flush()
+				if flushError != nil {
+					return flushError
+				}
 				return err
 			}
 		}
-		writer.Flush()
+		err = writer.Flush()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
