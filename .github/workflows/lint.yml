@@ -21,6 +21,6 @@ jobs:
           go-version: stable
 
       - name: Lint code
-        uses: actions/golangci-lint-action@main
+        uses: golangci/golangci-lint-action@v9
         with:
           version: v9.3.0
