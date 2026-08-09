@@ -31,8 +31,8 @@ This will be 2 spaces for now
 
 ### Code quality
 
-- [ ] Add unit tests
-- [ ] Add linter, unit-tests in CI
+- [x] Add unit tests
+- [x] Add linter, unit-tests in CI
 
 ### Misc
 
