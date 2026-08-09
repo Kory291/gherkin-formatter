@@ -15,8 +15,14 @@ If your sure what you are doing you can also run:
 ```
 go run github.com/Kory291/gherkin-formatt format --write
 ```
-This will write to the .feature files that were found.
+This will write to the `.feature` files that were found.
 
+
+You can also initialize a configuration file with:
+```
+go run github.com/Kory291/gherkin-formatter configuration init
+```
+This will create a file `gherkinFormatter.toml`
 
 ## Installation
 
