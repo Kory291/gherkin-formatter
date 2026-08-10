@@ -4,25 +4,26 @@ import (
 	re "regexp"
 	"slices"
 	s "strings"
+	"log/slog"
 
 	"github.com/Kory291/gherkin-formatter/internal/configuration"
 )
 
-type Element int
+type Element string
 
 const (
-	ElementGiven Element = iota
-	ElementWhen
-	ElementThen
-	ElementAnd
-	ElementFeature
-	ElementScenario
-	ElementBackground
-	ElementExamples
-	ElementDescription
-	ElementTag
-	ElementEmpty
-	ElementTable
+	ElementGiven Element = "Given"
+	ElementWhen Element = "When"
+	ElementThen Element = "Then"
+	ElementAnd Element = "And"
+	ElementFeature Element = "Feature"
+	ElementScenario Element = "Scenario"
+	ElementBackground Element = "Background"
+	ElementExamples Element = "Examples"
+	ElementDescription Element = "Description"
+	ElementTag Element = "Tag"
+	ElementEmpty Element = "Empty"
+	ElementTable Element = "Table"
 )
 
 var ElementRegex = map[Element]string{
@@ -55,21 +56,6 @@ func getCurrentGherkinElement(line string) Element {
 		return element
 	}  
 
-	// currentELementMatcher := re.MustCompile(`^(given\s|when\s|then\s|and\s|feature:|scenario( outline)?:|background:|examples)`)
-	// match := currentELementMatcher.FindString(line)
-	// if match != "" {
-	// 	match = s.TrimSuffix(match, ":")
-	// 	return s.TrimSuffix(match, " outline")
-	// }
-	// tagMatcher := re.MustCompile(`^@[\d\w_.-]+`)
-	// if tagMatcher.MatchString(line) {
-	// 	return "tag"
-	// }
-	// tableMatcher := re.MustCompile(ElementRegex[ElementTable])
-	// if tableMatcher.MatchString(line) {
-	// 	return "table"
-	// }
-	// return "description"
 	return ElementDescription
 }
 
@@ -82,7 +68,6 @@ func increaseIntendation(currentElement Element, previousElement Element, config
 
 	// Special case for tags:
 	// if a tag was before a scenario, we do not want to increase intendation for the scenario
-	
 	if currentElement == ElementEmpty {
 		return false
 	}
@@ -93,6 +78,9 @@ func increaseIntendation(currentElement Element, previousElement Element, config
 		return false
 	}
 	if (currentElement == ElementScenario || currentElement == ElementTag) && previousElement == ElementDescription {
+		return false
+	}
+	if currentElement == ElementScenario && previousElement == ElementTable {
 		return false
 	}
 	if currentElement == ElementTable && previousElement != ElementTable {
@@ -129,6 +117,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 	formattedFileContents := make([]string, 0)
 
 	var previousFoundElement Element
+	var tableSource string
 
 	for lineNumber, line := range fileContent {
 		cutLine := s.Trim(line, " ")
@@ -138,9 +127,10 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		tags := []string{}
-
+		slog.Debug("Working on line:", "cutLine", cutLine)
 		currentElement := getCurrentGherkinElement(cutLine)
-		// see if there are more tags in the following lines
+		// set source for table - either step or example
+				// see if there are more tags in the following lines
 		if currentElement == ElementTag && previousFoundElement != ElementTag {
 			tagsMatches := re.MustCompile(`@[\d\w_.-]+`)
 
@@ -161,20 +151,26 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			}
 		}
 
+		slog.Debug("Elements: ", "currentElement", currentElement, "previousFoundElement", previousFoundElement)
 		if currentElement == ElementTag && previousFoundElement == ElementTag {
 			continue
 		}
 
 		// check if indentation has to be increased
 		if increaseIntendation(currentElement, previousFoundElement, configuration) {
-			// fmt.Println("..Increasing intendation")
 			currentIntendation += 1
+			slog.Debug("Increase Intendation to", "currentIntendation", currentIntendation)
 		}
 
 		// check if intendation has to be decreased
 		if decreaseIntendation(currentElement, previousFoundElement, configuration) && currentIntendation > 1 {
-			// fmt.Println("..Decreasing intendation")
-			currentIntendation -= 1
+			slog.Debug("current tableSource", "tableSource", tableSource)
+			if tableSource == "Step" {
+				currentIntendation -= 2
+			} else {
+				currentIntendation -= 1
+			}
+			slog.Debug("Decrease Intendation to", "currentIntendation", currentIntendation)
 		}
 
 		if addNewLine(currentElement, previousFoundElement) {
@@ -182,6 +178,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		// set the new line with the required numbers of whitespaces
+		slog.Debug("Write line with intendation", "line", cutLine, "currentIntendation", currentIntendation)
 		newLine := s.Repeat(" ", currentIntendation*configuration.Intendation) + cutLine
 
 		if len(tags) > 0 {
@@ -192,10 +189,23 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		} else {
 			formattedFileContents = append(formattedFileContents, newLine)
 		}
-
-		if currentElement != ElementEmpty {
-			previousFoundElement = currentElement
+		if currentElement == ElementTable {
+			if previousFoundElement == ElementExamples {
+				tableSource = "Examples"
+			} else if slices.Contains([]Element{ElementGiven, ElementWhen, ElementThen, ElementAnd}, previousFoundElement) {
+				tableSource = "Step"
+			}
+		} else if currentElement != ElementEmpty {
+			if previousFoundElement == ElementTable {
+				slog.Debug("Unsetting tableSource for", "previousFoundElement", previousFoundElement, "currentElement", currentElement)
+				tableSource = ""
+			}
 		}
+		if currentElement == ElementEmpty {
+			slog.Debug("Skipping something becuase of empty line")
+			continue
+		}
+		previousFoundElement = currentElement
 	}
 	return formattedFileContents, nil
 }
