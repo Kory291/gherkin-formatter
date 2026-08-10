@@ -17,11 +17,12 @@ Feature: This will test with some table for a step
         Given I have something
         When I do something
         Then something happened
-            | name | value |
-            | <key>  | <value>   |
-            | hello| world |
+            And even more happened
+                | name | value |
+                | <key>  | <value>   |
+                | hello| world |
 
-    Examples: Some exmaples
-        | key | value |
-        | foo | bar |
-        | lucky | luke |
+        Examples: Some exmaples
+            | key | value |
+            | foo | bar |
+            | lucky | luke |
