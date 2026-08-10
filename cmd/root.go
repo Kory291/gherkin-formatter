@@ -12,16 +12,12 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gherkin-formatter",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "A simple formatter for feature files in Gherkin syntax",
+	Long: `This formatter will format feature files found in the ./features directory
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+To format files use gherkin-formatter format --write
+For more information see: https://github.com/Kory291/gherkin-formatter
+	`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -42,5 +38,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().Bool("dry-run", false, "Set this value if you don't want the changes to be written to the files.")
+	// rootCmd.Flags().Bool("dry-run", false, "Set this value if you don't want the changes to be written to the files.")
 }
