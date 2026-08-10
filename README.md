@@ -27,7 +27,7 @@ This will create a file `gherkinFormatter.toml`
 ## Installation
 
 ```
-go intall github.com/Kory291/gherkin-formatter
+go install github.com/Kory291/gherkin-formatter
 ```
 
 ## ToDo
