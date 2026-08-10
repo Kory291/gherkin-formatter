@@ -7,20 +7,20 @@ This will for now be focused on the project structure that is guided by the beha
 
 To just get an idea what will be done: 
 ```
-go run github.com/Kory291/gherkin-formatt format
+gherkin-formatter format
 ```
 
 
 If your sure what you are doing you can also run:
 ```
-go run github.com/Kory291/gherkin-formatt format --write
+gherkin-formatter format --write
 ```
 This will write to the `.feature` files that were found.
 
 
 You can also initialize a configuration file with:
 ```
-go run github.com/Kory291/gherkin-formatter configuration init
+gherkin-formatter configuration init
 ```
 This will create a file `gherkinFormatter.toml`
 
