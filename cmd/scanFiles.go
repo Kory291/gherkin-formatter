@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Kory291/gherkin-formatter/internal/fileHandling"
 	"github.com/spf13/cobra"
@@ -33,15 +34,9 @@ var scanFilesCmd = &cobra.Command{
 		if err != nil {
 			panic("Feature files could not be found")
 		}
-		fileContents, err := fileHandling.ReadFiles(fileNames)
-		if err != nil {
-			panic("Could not read files")
-		}
-		for filePath, fileContent := range fileContents {
-			fmt.Println("\n" + filePath)
-			for _, line := range fileContent {
-				fmt.Println(line)
-			}
+		slices.Sort(fileNames)
+		for _, fileName := range fileNames {
+			fmt.Println(fileName)
 		}
 	},
 }
