@@ -84,7 +84,7 @@ func increaseIntendation(currentElement Element, previousElement Element, config
 		return 0
 	}
 	if currentElement == ElementTable && previousElement != ElementTable {
-		return 	1
+		return 1
 	}
 	if previousElement == ElementFeature || previousElement == ElementScenario || previousElement == ElementBackground || previousElement == ElementExamples {
 		return 1
@@ -105,13 +105,21 @@ func decreaseIntendation(currentElement Element, previousElement Element, config
 	if configuration.IntendAnd && previousElement == ElementAnd {
 		if currentElement == ElementTable {
 			return 0
+		} else if currentElement == ElementScenario {
+			return 2
 		} else if currentElement != ElementAnd {
 			return 1
-		}	
+		}
 	}
 	if previousElement == ElementTable && currentElement != ElementTable {
 		return 1
 	}
+	if (currentElement == ElementScenario || currentElement == ElementTag) && (previousElement == ElementDescription || previousElement == ElementFeature || previousElement == ElementTag) {
+		return 0
+	} 
+	// if (currentElement == ElementScenario || currentElement == ElementTag) && (previousElement == ElementGiven || previousElement == ElementWhen || previousElement == ElementThen || (previousElement == ElementAnd && configuration.IntendAnd)) {
+	// 	return 1
+	// }
 	if currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag {
 		return 1
 	}
@@ -137,7 +145,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		tags := []string{}
-		slog.Debug("Working on line:", "cutLine", cutLine)
+		slog.Info("Working on line:", "cutLine", cutLine)
 		currentElement := getCurrentGherkinElement(cutLine)
 		// set source for table - either step or example
 				// see if there are more tags in the following lines
@@ -161,14 +169,14 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			}
 		}
 
-		slog.Debug("Elements: ", "currentElement", currentElement, "previousFoundElement", previousFoundElement)
+		slog.Info("Elements: ", "currentElement", currentElement, "previousFoundElement", previousFoundElement)
 		if currentElement == ElementTag && previousFoundElement == ElementTag {
 			continue
 		}
 
 		// check if indentation has to be increased
 		if intendationChange := increaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
-			slog.Debug("Increasing intendation from ", currentIntendation, " to ", currentIntendation + intendationChange)
+			slog.Info("Increasing intendation from ", "currentIntendation", currentIntendation, " by ", "intendationChange", intendationChange)
 			currentIntendation += intendationChange
 		}
 
@@ -181,7 +189,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			if currentIntendation < 0 {
 				currentIntendation = 0
 			}
-			slog.Debug("Decreased intendation to ", currentIntendation)
+			slog.Info("Decreased intendation to ", "currentIntedantion", currentIntendation)
 		}
 		
 
@@ -190,7 +198,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		// set the new line with the required numbers of whitespaces
-		slog.Debug("Write line with intendation", "line", cutLine, "currentIntendation", currentIntendation)
+		slog.Info("Write line with intendation", "line", cutLine, "currentIntendation", currentIntendation)
 		newLine := s.Repeat(" ", currentIntendation*configuration.Intendation) + cutLine
 
 		if len(tags) > 0 {
@@ -209,12 +217,12 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			}
 		} else if currentElement != ElementEmpty {
 			if previousFoundElement == ElementTable {
-				slog.Debug("Unsetting tableSource for", "previousFoundElement", previousFoundElement, "currentElement", currentElement)
+				slog.Info("Unsetting tableSource for", "previousFoundElement", previousFoundElement, "currentElement", currentElement)
 				tableSource = ""
 			}
 		}
 		if currentElement == ElementEmpty {
-			slog.Debug("Skipping something becuase of empty line")
+			slog.Info("Skipping something becuase of empty line")
 			continue
 		}
 		previousFoundElement = currentElement
