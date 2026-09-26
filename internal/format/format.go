@@ -184,6 +184,8 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		if intendationChange := decreaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
 			if tableSource == "Step" {
 				intendationChange += 1
+			} else if tableSource == "And" && configuration.IntendAnd {
+				intendationChange += 2
 			}
 			currentIntendation -= intendationChange
 			if currentIntendation < 0 {
@@ -212,9 +214,11 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		if currentElement == ElementTable {
 			if previousFoundElement == ElementExamples {
 				tableSource = "Examples"
-			} else if slices.Contains([]Element{ElementGiven, ElementWhen, ElementThen, ElementAnd}, previousFoundElement) {
+			} else if slices.Contains([]Element{ElementGiven, ElementWhen, ElementThen}, previousFoundElement) {
 				tableSource = "Step"
-			}
+			} else if previousFoundElement == ElementAnd {
+				tableSource = "And"
+			} 
 		} else if currentElement != ElementEmpty {
 			if previousFoundElement == ElementTable {
 				slog.Debug("Unsetting tableSource for", "previousFoundElement", previousFoundElement, "currentElement", currentElement)
