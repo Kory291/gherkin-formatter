@@ -59,7 +59,7 @@ func getCurrentGherkinElement(line string) Element {
 	return ElementDescription
 }
 
-func increaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) bool {
+func increaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) int {
 	// find in which line we are
 	// this is important if we have a change in the following cases:
 	// Feature name -> Feature description
@@ -69,47 +69,53 @@ func increaseIntendation(currentElement Element, previousElement Element, config
 	// Special case for tags:
 	// if a tag was before a scenario, we do not want to increase intendation for the scenario
 	if currentElement == ElementEmpty {
-		return false
+		return 0
 	}
 	if currentElement == previousElement {
-		return false
+		return 0
 	}
 	if currentElement == ElementScenario && previousElement == ElementTag {
-		return false
+		return 0
 	}
 	if (currentElement == ElementScenario || currentElement == ElementTag) && previousElement == ElementDescription {
-		return false
+		return 0
 	}
 	if currentElement == ElementScenario && previousElement == ElementTable {
-		return false
+		return 0
 	}
 	if currentElement == ElementTable && previousElement != ElementTable {
-		return true
+		return 	1
 	}
 	if previousElement == ElementFeature || previousElement == ElementScenario || previousElement == ElementBackground || previousElement == ElementExamples {
-		return true
+		return 1
 	}
 	if !configuration.IntendAnd {
-		return false
+		return 0
 	}
-	return (currentElement == ElementAnd) && (previousElement != ElementAnd)
+	if (currentElement == ElementAnd) && (previousElement != ElementAnd) {
+		return 1
+	}
+	return 0
 }
 
-func decreaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) bool {
+func decreaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) int {
 	if currentElement == ElementEmpty {
-		return false
+		return 0
 	}
 	if configuration.IntendAnd && previousElement == ElementAnd {
 		if currentElement == ElementTable {
-			return false
+			return 0
 		} else if currentElement != ElementAnd {
-			return true
+			return 1
 		}	
 	}
 	if previousElement == ElementTable && currentElement != ElementTable {
-		return true
+		return 1
 	}
-	return currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag
+	if currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag {
+		return 1
+	}
+	return 0
 }
 
 func addNewLine(currentElement Element, previousElement Element) bool {
@@ -161,21 +167,23 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		// check if indentation has to be increased
-		if increaseIntendation(currentElement, previousFoundElement, configuration) {
-			currentIntendation += 1
-			slog.Debug("Increase Intendation to", "currentIntendation", currentIntendation)
+		if intendationChange := increaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
+			slog.Debug("Increasing intendation from ", currentIntendation, " to ", currentIntendation + intendationChange)
+			currentIntendation += intendationChange
 		}
 
 		// check if intendation has to be decreased
-		if decreaseIntendation(currentElement, previousFoundElement, configuration) && currentIntendation > 1 {
-			slog.Debug("current tableSource", "tableSource", tableSource)
+		if intendationChange := decreaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
 			if tableSource == "Step" {
-				currentIntendation -= 2
-			} else {
-				currentIntendation -= 1
+				intendationChange += 1
 			}
-			slog.Debug("Decrease Intendation to", "currentIntendation", currentIntendation)
+			currentIntendation -= intendationChange
+			if currentIntendation < 0 {
+				currentIntendation = 0
+			}
+			slog.Debug("Decreased intendation to ", currentIntendation)
 		}
+		
 
 		if addNewLine(currentElement, previousFoundElement) {
 			formattedFileContents = append(formattedFileContents, "")
