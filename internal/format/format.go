@@ -105,7 +105,7 @@ func decreaseIntendation(currentElement Element, previousElement Element, config
 	if configuration.IntendAnd && previousElement == ElementAnd {
 		if currentElement == ElementTable {
 			return 0
-		} else if currentElement == ElementScenario {
+		} else if currentElement == ElementScenario || currentElement == ElementExamples {
 			return 2
 		} else if currentElement != ElementAnd {
 			return 1
@@ -117,9 +117,6 @@ func decreaseIntendation(currentElement Element, previousElement Element, config
 	if (currentElement == ElementScenario || currentElement == ElementTag) && (previousElement == ElementDescription || previousElement == ElementFeature || previousElement == ElementTag) {
 		return 0
 	} 
-	// if (currentElement == ElementScenario || currentElement == ElementTag) && (previousElement == ElementGiven || previousElement == ElementWhen || previousElement == ElementThen || (previousElement == ElementAnd && configuration.IntendAnd)) {
-	// 	return 1
-	// }
 	if currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag {
 		return 1
 	}
@@ -182,10 +179,14 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 
 		// check if intendation has to be decreased
 		if intendationChange := decreaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
-			if tableSource == "Step" {
-				intendationChange += 1
-			} else if tableSource == "And" && configuration.IntendAnd {
-				intendationChange += 2
+			if currentElement == ElementExamples || currentElement == ElementScenario || currentElement == ElementTag {
+				if tableSource == "Step" {
+					intendationChange += 1
+				} else if tableSource == "And" && configuration.IntendAnd {
+					intendationChange += 2
+				} else if tableSource == "And" && !configuration.IntendAnd {
+					intendationChange += 1
+				}
 			}
 			currentIntendation -= intendationChange
 			if currentIntendation < 0 {
