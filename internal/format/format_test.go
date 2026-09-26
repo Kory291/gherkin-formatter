@@ -34,16 +34,16 @@ func TestIncreaseIntendation(t *testing.T) {
 	testCases := []struct {
 		currentElement  Element
 		previousElement Element
-		expected        bool
+		expected        int
 	}{
-		{ElementFeature, ElementEmpty, false},
-		{ElementScenario, ElementFeature, true},
-		{ElementGiven, ElementScenario, true},
-		{ElementWhen, ElementGiven, false},
-		{ElementThen, ElementWhen, false},
-		{ElementAnd, ElementThen, false},
-		{ElementBackground, ElementFeature, true},
-		{ElementExamples, ElementScenario, true},
+		{ElementFeature, ElementEmpty, 0},
+		{ElementScenario, ElementFeature, 1},
+		{ElementGiven, ElementScenario, 1},
+		{ElementWhen, ElementGiven, 0},
+		{ElementThen, ElementWhen, 0},
+		{ElementAnd, ElementThen, 0},
+		{ElementBackground, ElementFeature, 1},
+		{ElementExamples, ElementScenario, 1},
 	}
 
 	for _, tc := range testCases {
@@ -59,18 +59,18 @@ func TestDecreaseIntendation(t *testing.T) {
 	testCases := []struct {
 		currentElement  Element
 		previousElement Element
-		expected        bool
+		expected        int
 	}{
-		{ElementGiven, ElementAnd, true},
-		{ElementWhen, ElementAnd, true},
-		{ElementThen, ElementAnd, true},
-		{ElementAnd, ElementGiven, false},
-		{ElementAnd, ElementWhen, false},
-		{ElementEmpty, ElementAnd, false},
-		{ElementScenario, ElementThen, true},
-		{ElementGiven, ElementGiven, false},
-		{ElementWhen, ElementWhen, false},
-		{ElementThen, ElementThen, false},
+		{ElementGiven, ElementAnd, 1},
+		{ElementWhen, ElementAnd, 1},
+		{ElementThen, ElementAnd, 1},
+		{ElementAnd, ElementGiven, 0},
+		{ElementAnd, ElementWhen, 0},
+		{ElementEmpty, ElementAnd, 0},
+		{ElementScenario, ElementThen, 1},
+		{ElementGiven, ElementGiven, 0},
+		{ElementWhen, ElementWhen, 0},
+		{ElementThen, ElementThen, 0},
 	}
 
 	for _, tc := range testCases {
