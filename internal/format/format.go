@@ -145,7 +145,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		tags := []string{}
-		slog.Info("Working on line:", "cutLine", cutLine)
+		slog.Debug("Working on line:", "cutLine", cutLine)
 		currentElement := getCurrentGherkinElement(cutLine)
 		// set source for table - either step or example
 				// see if there are more tags in the following lines
@@ -169,14 +169,14 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			}
 		}
 
-		slog.Info("Elements: ", "currentElement", currentElement, "previousFoundElement", previousFoundElement)
+		slog.Debug("Elements: ", "currentElement", currentElement, "previousFoundElement", previousFoundElement)
 		if currentElement == ElementTag && previousFoundElement == ElementTag {
 			continue
 		}
 
 		// check if indentation has to be increased
 		if intendationChange := increaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
-			slog.Info("Increasing intendation from ", "currentIntendation", currentIntendation, "intendationChange", intendationChange)
+			slog.Debug("Increasing intendation from ", "currentIntendation", currentIntendation, "intendationChange", intendationChange)
 			currentIntendation += intendationChange
 		}
 
@@ -189,7 +189,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			if currentIntendation < 0 {
 				currentIntendation = 0
 			}
-			slog.Info("Decreased intendation to ", "currentIntedantion", currentIntendation)
+			slog.Debug("Decreased intendation to ", "currentIntedantion", currentIntendation)
 		}
 		
 
@@ -198,7 +198,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		}
 
 		// set the new line with the required numbers of whitespaces
-		slog.Info("Write line with intendation", "line", cutLine, "currentIntendation", currentIntendation)
+		slog.Debug("Write line with intendation", "line", cutLine, "currentIntendation", currentIntendation)
 		newLine := s.Repeat(" ", currentIntendation*configuration.Intendation) + cutLine
 
 		if len(tags) > 0 {
@@ -217,12 +217,12 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 			}
 		} else if currentElement != ElementEmpty {
 			if previousFoundElement == ElementTable {
-				slog.Info("Unsetting tableSource for", "previousFoundElement", previousFoundElement, "currentElement", currentElement)
+				slog.Debug("Unsetting tableSource for", "previousFoundElement", previousFoundElement, "currentElement", currentElement)
 				tableSource = ""
 			}
 		}
 		if currentElement == ElementEmpty {
-			slog.Info("Skipping something becuase of empty line")
+			slog.Debug("Skipping something becuase of empty line")
 			continue
 		}
 		previousFoundElement = currentElement
