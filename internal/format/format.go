@@ -176,7 +176,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 
 		// check if indentation has to be increased
 		if intendationChange := increaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
-			slog.Info("Increasing intendation from ", "currentIntendation", currentIntendation, " by ", "intendationChange", intendationChange)
+			slog.Info("Increasing intendation from ", "currentIntendation", currentIntendation, "intendationChange", intendationChange)
 			currentIntendation += intendationChange
 		}
 
