@@ -26,5 +26,18 @@ Feature: This will test with some table for a step
     | key | value |
     | foo | bar |  
     | lucky | luke |
+  
+  Scenario: Fourth scenario
+    Given I have something
+    When I do something
+    Then something happened
+    And something different happened
+      | key | value |
+      | foo | bar |
+      | hello | there |
 
+  Scenario: Fifth scenario
+    Given I have something
+    When I do something
+    Then something happened
 
