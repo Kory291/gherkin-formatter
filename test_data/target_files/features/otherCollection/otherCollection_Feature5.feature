@@ -20,7 +20,7 @@ Feature: This will test with some table for a step
             | name | value |
             | <key>  | <value>   |
             | hello| world |
-        And something else happened
+            And something else happened
 
     Examples: Some exmaples
         | key | value |
