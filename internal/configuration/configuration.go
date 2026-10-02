@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	IntendAnd   bool
+	IndentAnd   bool
 	Indentation int
 	SortTags    bool
 }
@@ -18,7 +18,7 @@ var ConfigFileNotFoundError viper.ConfigFileNotFoundError
 
 func setDefaults() {
 	viper.SetDefault("indentation", 2)
-	viper.SetDefault("intend-and", true)
+	viper.SetDefault("indent-and", true)
 	viper.SetDefault("sort-tags", true)
 }
 
@@ -41,7 +41,7 @@ func ReadConfiguration(path string) (*Config, error) {
 		}
 	}
 
-	Configuration.IntendAnd = viper.GetBool("intend-and")
+	Configuration.IndentAnd = viper.GetBool("indent-and")
 	Configuration.Indentation = viper.GetInt("indentation")
 	Configuration.SortTags = viper.GetBool("sort-tags")
 
@@ -71,7 +71,7 @@ func CreateConfiguration(configDir string) error {
 
 func PrintConfiguration(configuration *Config) {
 	fmt.Println("Configuration read:")
-	fmt.Printf("intend-and:\t%t\n", configuration.IntendAnd)
+	fmt.Printf("indent-and:\t%t\n", configuration.IndentAnd)
 	fmt.Printf("indentation:\t%d\n", configuration.Indentation)
 	fmt.Printf("sort-tags:\t%t\n", configuration.SortTags)
 }
