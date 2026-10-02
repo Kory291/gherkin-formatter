@@ -40,7 +40,7 @@ Note: Assumed project structure is that all `.feature` files are in a directory 
 
 ### Formatting options
 
-- [x] set default value for intendation
+- [x] set default value for indentation
 This will be 2 spaces for now
 - [ ] set allignment
 
