@@ -24,6 +24,7 @@ const (
 	ElementTag Element = "Tag"
 	ElementEmpty Element = "Empty"
 	ElementTable Element = "Table"
+	ElementComment Element = "Comment"
 )
 
 var ElementRegex = map[Element]string{
@@ -35,6 +36,7 @@ var ElementRegex = map[Element]string{
 	ElementScenario: `^scenario( outline)?:`,
 	ElementBackground: `^background:`,
 	ElementExamples: `^examples`,
+	ElementComment: `^\s*#`,
 	ElementDescription: ``,
 	ElementTag: `^@[\d\w_.-]`,
 	ElementTable: `^\|`,
@@ -68,7 +70,7 @@ func increaseIntendation(currentElement Element, previousElement Element, config
 
 	// Special case for tags:
 	// if a tag was before a scenario, we do not want to increase intendation for the scenario
-	if currentElement == ElementEmpty {
+	if currentElement == ElementEmpty || currentElement == ElementComment {
 		return 0
 	}
 	if currentElement == previousElement {
@@ -92,20 +94,21 @@ func increaseIntendation(currentElement Element, previousElement Element, config
 	if !configuration.IntendAnd {
 		return 0
 	}
-	if (currentElement == ElementAnd) && (previousElement != ElementAnd) {
+	// if currentElement == ElementAnd && previousElement != ElementAnd && previousElement != ElementTable {
+	if currentElement == ElementAnd && previousElement != ElementAnd {
 		return 1
 	}
 	return 0
 }
 
 func decreaseIntendation(currentElement Element, previousElement Element, configuration configuration.Config) int {
-	if currentElement == ElementEmpty {
+	if currentElement == ElementEmpty || currentElement == ElementComment {
 		return 0
 	}
 	if configuration.IntendAnd && previousElement == ElementAnd {
 		if currentElement == ElementTable {
 			return 0
-		} else if currentElement == ElementScenario || currentElement == ElementExamples {
+		} else if currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag {
 			return 2
 		} else if currentElement != ElementAnd {
 			return 1
@@ -174,11 +177,17 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		// check if indentation has to be increased
 		if intendationChange := increaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
 			slog.Debug("Increasing intendation from ", "currentIntendation", currentIntendation, "intendationChange", intendationChange)
+			if tableSource == "And" && currentElement == ElementAnd && configuration.IntendAnd {
+				intendationChange -= 1
+			}
 			currentIntendation += intendationChange
 		}
 
 		// check if intendation has to be decreased
 		if intendationChange := decreaseIntendation(currentElement, previousFoundElement, configuration); intendationChange > 0 {
+			if (currentElement == ElementGiven || currentElement == ElementWhen || currentElement == ElementThen) && tableSource == "And" && configuration.IntendAnd {
+				intendationChange += 1
+			}
 			if currentElement == ElementExamples || currentElement == ElementScenario || currentElement == ElementTag {
 				if tableSource == "Step" {
 					intendationChange += 1
