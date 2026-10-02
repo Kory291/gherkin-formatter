@@ -74,7 +74,7 @@ func TestDecreaseIndentation(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		actual := decreaseIndentation(tc.currentElement, tc.previousElement, configuration.Config{IntendAnd: true})
+		actual := decreaseIndentation(tc.currentElement, tc.previousElement, configuration.Config{IndentAnd: true})
 		if actual != tc.expected {
 			t.Errorf("For currentElement %v and previousElement %v, expected %v but got %v", tc.currentElement, tc.previousElement, tc.expected, actual)
 		}

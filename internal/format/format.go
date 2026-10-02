@@ -91,7 +91,7 @@ func increaseIndentation(currentElement Element, previousElement Element, config
 	if previousElement == ElementFeature || previousElement == ElementScenario || previousElement == ElementBackground || previousElement == ElementExamples {
 		return 1
 	}
-	if !configuration.IntendAnd {
+	if !configuration.IndentAnd {
 		return 0
 	}
 	// if currentElement == ElementAnd && previousElement != ElementAnd && previousElement != ElementTable {
@@ -105,7 +105,7 @@ func decreaseIndentation(currentElement Element, previousElement Element, config
 	if currentElement == ElementEmpty || currentElement == ElementComment {
 		return 0
 	}
-	if configuration.IntendAnd && previousElement == ElementAnd {
+	if configuration.IndentAnd && previousElement == ElementAnd {
 		if currentElement == ElementTable {
 			return 0
 		} else if currentElement == ElementScenario || currentElement == ElementExamples || currentElement == ElementTag {
@@ -177,7 +177,7 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 		// check if indentation has to be increased
 		if indentationChange := increaseIndentation(currentElement, previousFoundElement, configuration); indentationChange > 0 {
 			slog.Debug("Increasing indentation from ", "currentIndentation", currentIndentation, "indentationChange", indentationChange)
-			if tableSource == "And" && currentElement == ElementAnd && configuration.IntendAnd {
+			if tableSource == "And" && currentElement == ElementAnd && configuration.IndentAnd {
 				indentationChange -= 1
 			}
 			currentIndentation += indentationChange
@@ -185,15 +185,15 @@ func FormatFile(fileContent []string, configuration configuration.Config) ([]str
 
 		// check if indentation has to be decreased
 		if indentationChange := decreaseIndentation(currentElement, previousFoundElement, configuration); indentationChange > 0 {
-			if (currentElement == ElementGiven || currentElement == ElementWhen || currentElement == ElementThen) && tableSource == "And" && configuration.IntendAnd {
+			if (currentElement == ElementGiven || currentElement == ElementWhen || currentElement == ElementThen) && tableSource == "And" && configuration.IndentAnd {
 				indentationChange += 1
 			}
 			if currentElement == ElementExamples || currentElement == ElementScenario || currentElement == ElementTag {
 				if tableSource == "Step" {
 					indentationChange += 1
-				} else if tableSource == "And" && configuration.IntendAnd {
+				} else if tableSource == "And" && configuration.IndentAnd {
 					indentationChange += 2
-				} else if tableSource == "And" && !configuration.IntendAnd {
+				} else if tableSource == "And" && !configuration.IndentAnd {
 					indentationChange += 1
 				}
 			}
