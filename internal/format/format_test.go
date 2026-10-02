@@ -29,7 +29,7 @@ func TestGetCurrentGherkinElement(t *testing.T) {
 	}
 }
 
-func TestIncreaseIntendation(t *testing.T) {
+func TestIncreaseIndentation(t *testing.T) {
 	// Define test cases
 	testCases := []struct {
 		currentElement  Element
@@ -47,14 +47,14 @@ func TestIncreaseIntendation(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		actual := increaseIntendation(tc.currentElement, tc.previousElement, configuration.Config{})
+		actual := increaseIndentation(tc.currentElement, tc.previousElement, configuration.Config{})
 		if actual != tc.expected {
 			t.Errorf("For currentElement %v and previousElement %v, expected %v but got %v", tc.currentElement, tc.previousElement, tc.expected, actual)
 		}
 	}
 }
 
-func TestDecreaseIntendation(t *testing.T) {
+func TestDecreaseIndentation(t *testing.T) {
 	// Define test cases
 	testCases := []struct {
 		currentElement  Element
@@ -74,7 +74,7 @@ func TestDecreaseIntendation(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		actual := decreaseIntendation(tc.currentElement, tc.previousElement, configuration.Config{IntendAnd: true})
+		actual := decreaseIndentation(tc.currentElement, tc.previousElement, configuration.Config{IntendAnd: true})
 		if actual != tc.expected {
 			t.Errorf("For currentElement %v and previousElement %v, expected %v but got %v", tc.currentElement, tc.previousElement, tc.expected, actual)
 		}
